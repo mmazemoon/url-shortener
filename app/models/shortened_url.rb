@@ -1,4 +1,12 @@
 class ShortenedUrl < ActiveRecord::Base
+
+  belongs_to(
+    :user,
+    class_name: "User",
+    foreign_key: :submitter_id,
+    primary_key: :id
+  )
+
   validates :short_url, presence: true, uniqueness: true
   validates :long_url, presence: true, uniqueness: true
 
