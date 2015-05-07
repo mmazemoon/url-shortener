@@ -21,10 +21,17 @@ class ShortenedUrl < ActiveRecord::Base
   )
 
   has_many(
-    :visitors,
+    :visits,
     class_name: "Visit",
     foreign_key: :shortened_url_id,
     primary_key: :id
+  )
+
+  has_many(
+    :visitors,
+    Proc.new { distinct },
+    through: :visits,
+    source: :visitor
   )
 
   def self.random_code
@@ -41,19 +48,18 @@ class ShortenedUrl < ActiveRecord::Base
   end
 
   def num_clicks
-    visitors.count
+    visits.count
   end
 
   # uniq synonymous with distinct
   def num_uniques
-    visitors.distinct.count
+    visitors.count
   end
 
   def num_recent_uniques(time_diff)
     visitors        # an activerecord object
-      .where("updated_at < ?", time_diff)
-      .distinct     # doesn't get evaluated until you return something.
-      .count
+      .where("visits.updated_at < ?", time_diff)
+      .count        # doesn't get evaluated until you return something.
   end
 end
 
