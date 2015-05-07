@@ -21,7 +21,7 @@ class ShortenedUrl < ActiveRecord::Base
   )
 
   has_many(
-    :visited_urls,
+    :visitors,
     class_name: "Visit",
     foreign_key: :shortened_url_id,
     primary_key: :id
@@ -38,6 +38,22 @@ class ShortenedUrl < ActiveRecord::Base
   # create will create an instance and save to database with attributes
   def self.create_for_user_and_long_url!(user, long_url)
     create!(long_url: long_url, short_url: self.random_code, submitter_id: user.id)
+  end
+
+  def num_clicks
+    visitors.count
+  end
+
+  # uniq synonymous with distinct
+  def num_uniques
+    visitors.distinct.count
+  end
+
+  def num_recent_uniques(time_diff)
+    visitors        # an activerecord object
+      .where("updated_at < ?", time_diff)
+      .distinct     # doesn't get evaluated until you return something.
+      .count
   end
 end
 

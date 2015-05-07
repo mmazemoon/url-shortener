@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   )
 
   has_many(
-    :visitors,
+    :visited_urls,
     class_name: "Visit",
     foreign_key: :visitor_id,
     primary_key: :id
